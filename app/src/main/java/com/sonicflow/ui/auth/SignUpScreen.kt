@@ -7,6 +7,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -26,14 +27,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sonicflow.ui.theme.*
 
 /**
- * Sign in screen with email and password authentication
+ * Sign up screen for new user registration
  */
 @Composable
-fun SignInScreen(
-    onNavigateToSignUp: () -> Unit,
+fun SignUpScreen(
+    onNavigateToSignIn: () -> Unit,
     onNavigateToLibrary: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val name by viewModel.name.collectAsState()
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -65,12 +67,46 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "Sign in to continue",
+                text = "Create your account",
                 style = MaterialTheme.typography.bodyLarge,
                 color = TextSecondary
             )
             
             Spacer(modifier = Modifier.height(48.dp))
+            
+            // Name field
+            OutlinedTextField(
+                value = name,
+                onValueChange = { viewModel.updateName(it) },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Name") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Name icon"
+                    )
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = VioletPrimary,
+                    unfocusedBorderColor = TextSecondary,
+                    focusedLabelColor = VioletPrimary,
+                    unfocusedLabelColor = TextSecondary,
+                    cursorColor = VioletPrimary,
+                    focusedLeadingIconColor = VioletPrimary,
+                    unfocusedLeadingIconColor = TextSecondary
+                ),
+                enabled = !isLoading
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
             
             // Email field
             OutlinedTextField(
@@ -135,7 +171,7 @@ fun SignInScreen(
                 keyboardActions = KeyboardActions(
                     onDone = {
                         focusManager.clearFocus()
-                        viewModel.signIn(onNavigateToLibrary)
+                        viewModel.signUp(onNavigateToLibrary)
                     }
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -168,9 +204,9 @@ fun SignInScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Sign in button
+            // Sign up button
             Button(
-                onClick = { viewModel.signIn(onNavigateToLibrary) },
+                onClick = { viewModel.signUp(onNavigateToLibrary) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -188,7 +224,7 @@ fun SignInScreen(
                     )
                 } else {
                     Text(
-                        text = "Sign In",
+                        text = "Sign Up",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -197,21 +233,21 @@ fun SignInScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Sign up link
+            // Sign in link
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Don't have an account? ",
+                    text = "Already have an account? ",
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary
                 )
                 TextButton(
-                    onClick = onNavigateToSignUp,
+                    onClick = onNavigateToSignIn,
                     enabled = !isLoading
                 ) {
                     Text(
-                        text = "Sign up",
+                        text = "Sign in",
                         color = VioletSecondary,
                         fontWeight = FontWeight.Bold
                     )
