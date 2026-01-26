@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -58,15 +59,14 @@ class PlayerViewModel @Inject constructor(
     
     fun loadTrack(trackId: Long) {
         viewModelScope.launch {
-            getTracksUseCase(trackId).collect { track ->
-                _currentTrack.value = track
-                track?.let {
-                    _duration.value = it.duration
-                    // Play track
-                    mediaControllerManager.playTrack(it.filePath)
-                    // Load waveform
-                    loadWaveform(it.filePath)
-                }
+            val track = getTracksUseCase(trackId).first()
+            _currentTrack.value = track
+            track?.let {
+                _duration.value = it.duration
+                // Play track
+                mediaControllerManager.playTrack(it.filePath)
+                // Load waveform
+                loadWaveform(it.filePath)
             }
         }
     }
