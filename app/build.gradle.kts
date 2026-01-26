@@ -97,6 +97,9 @@ dependencies {
     // Coil for image loading
     implementation(libs.coil.compose)
     
+    // Reorderable for drag and drop lists
+    implementation(libs.reorderable)
+    
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
