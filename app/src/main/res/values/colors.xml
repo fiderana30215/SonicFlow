@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- SonicFlow Brand Colors - Violet/Purple Theme -->
+    <color name="violet_primary">#8B5CF6</color>
+    <color name="violet_secondary">#A78BFA</color>
+    <color name="violet_tertiary">#6D28D9</color>
+    
+    <!-- Dark Theme Colors -->
+    <color name="dark_background">#121212</color>
+    <color name="dark_surface">#1E1E1E</color>
+    <color name="dark_surface_variant">#2A2A2A</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_disabled">#6B6B6B</color>
+    
+    <!-- Accent Colors -->
+    <color name="error">#CF6679</color>
+    <color name="success">#4CAF50</color>
+    
+    <!-- Legacy Android Colors (kept for compatibility) -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
