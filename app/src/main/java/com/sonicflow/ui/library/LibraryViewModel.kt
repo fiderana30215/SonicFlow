@@ -99,6 +99,10 @@ class LibraryViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 getTracksUseCase.scanTracks()
+            } catch (e: SecurityException) {
+                // Gérer l'exception de permission
+                _isLoading.value = false
+                // Optionnel : émettre un événement pour informer l'UI que la permission est nécessaire
             } catch (e: Exception) {
                 // Handle error
             } finally {
