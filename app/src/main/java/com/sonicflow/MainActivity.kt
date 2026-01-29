@@ -28,9 +28,9 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // Permission accordée - l'utilisateur peut maintenant scanner sa bibliothèque
+            // Permission granted - user can now scan their library
         } else {
-            // Permission refusée - afficher un message à l'utilisateur
+            // Permission denied - show a message to the user
         }
     }
     
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Demander les permissions au démarrage
+        // Request permissions at startup
         requestAudioPermission()
         
         setContent {
@@ -66,10 +66,10 @@ class MainActivity : ComponentActivity() {
                 this,
                 permission
             ) == PackageManager.PERMISSION_GRANTED -> {
-                // Permission déjà accordée
+                // Permission already granted
             }
             else -> {
-                // Demander la permission
+                // Request permission
                 requestPermissionLauncher.launch(permission)
             }
         }
