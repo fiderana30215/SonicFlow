@@ -1,21 +1,44 @@
 [versions]
-agp = "8.3.0"
+# Android Gradle Plugin - doit être 8.6.0+ pour Compose 1.9.0
+agp = "8.7.3"
+
+# Kotlin 2.0 et KSP compatible
 kotlin = "2.0.0"
 ksp = "2.0.0-1.0.21"
-coreKtx = "1.13.1"
+
+# Core
+coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.4"
-activityCompose = "1.9.1"
-composeBom = "2024.06.00"
-navigationCompose = "2.7.7"
-hilt = "2.51.1"
+
+# Lifecycle - version compatible avec AGP 8.7.3
+lifecycleRuntimeKtx = "2.8.7"
+
+# Activity et Compose
+activityCompose = "1.9.3"
+composeBom = "2024.11.00"
+
+# Navigation
+navigationCompose = "2.8.4"
+
+# Hilt
+hilt = "2.52"
 hiltNavigationCompose = "1.2.0"
+
+# Room
 room = "2.6.1"
-media3 = "1.4.0"
+
+# Media3
+media3 = "1.4.1"
+
+# DataStore
 datastore = "1.1.1"
-coil = "2.6.0"
+
+# Coil
+coil = "2.7.0"
+
+# Reorderable
 reorderable = "0.9.6"
 
 [libraries]
