@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.sonicflow"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.sonicflow"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -23,12 +23,10 @@ android {
             useSupportLibrary = true
         }
         
-
-    }
-
-    // Room schema export directory
-    ksp {
-        arg("room.schemaLocation", "$projectDir/schemas")
+        // Room schema export directory
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
     }
 
     buildTypes {
@@ -66,8 +64,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
-
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
     
     // Compose
     implementation(platform(libs.androidx.compose.bom))
