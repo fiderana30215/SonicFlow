@@ -50,9 +50,10 @@ android {
     }
 }
 
-// KSP configuration - must be at root level to avoid "Suspicious receiver type" error
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
+// Room schema export configuration using KSP
+// Using explicit configure to avoid "Suspicious receiver type" warning
+configure<com.google.devtools.ksp.gradle.KspExtension> {
+    arg("room.schemaLocation", "${projectDir}/schemas")
 }
 
 dependencies {
