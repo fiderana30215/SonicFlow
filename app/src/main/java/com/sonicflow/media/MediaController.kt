@@ -107,8 +107,8 @@ class MediaControllerManager @Inject constructor(
         stopPositionUpdates()
         positionUpdateJob = scope.launch {
             while (isActive) {
-                updatePlaybackState()
                 delay(POSITION_UPDATE_INTERVAL_MS)
+                updatePlaybackState()
             }
         }
     }
