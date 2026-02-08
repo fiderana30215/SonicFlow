@@ -1,6 +1,6 @@
 [versions]
 # Android Gradle Plugin - doit être 8.6.0+ pour Compose 1.9.0
-agp = "8.1.0"
+agp = "8.7.3"
 
 # Kotlin 2.0 et KSP compatible
 kotlin = "2.0.0"
