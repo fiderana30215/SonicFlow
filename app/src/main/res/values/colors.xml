@@ -5,6 +5,9 @@
     <color name="violet_secondary">#A78BFA</color>
     <color name="violet_tertiary">#6D28D9</color>
     
+    <!-- Splash Screen Colors -->
+    <color name="splash_background">#1A1A2E</color>
+    
     <!-- Dark Theme Colors -->
     <color name="dark_background">#121212</color>
     <color name="dark_surface">#1E1E1E</color>

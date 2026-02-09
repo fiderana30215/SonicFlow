@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.SonicFlow" parent="android:Theme.Material.Light.NoActionBar" />
+    
+    <style name="Theme.SonicFlow.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.SonicFlow</item>
+    </style>
 </resources>
