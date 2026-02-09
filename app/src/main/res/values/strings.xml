@@ -2,6 +2,9 @@
     <!-- App Name -->
     <string name="app_name">SonicFlow</string>
     
+    <!-- Splash Screen -->
+    <string name="splash_tagline">Your Music, Your Flow</string>
+    
     <!-- Auth Screens -->
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>

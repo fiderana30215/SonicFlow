@@ -23,16 +23,23 @@
         android:theme="@style/Theme.SonicFlow"
         tools:targetApi="31">
         
-        <!-- Main Activity -->
+        <!-- Splash Screen Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.SonicFlow">
+            android:theme="@style/Theme.SonicFlow.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        
+        <!-- Main Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SonicFlow">
         </activity>
 
         <!-- Media Playback Service -->
