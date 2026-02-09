@@ -41,9 +41,11 @@ class SplashActivity : AppCompatActivity() {
         // Navigate to MainActivity after delay
         lifecycleScope.launch {
             delay(SPLASH_DURATION)
-            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-            finish()
+            if (!isFinishing) {
+                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+                finish()
+            }
         }
     }
 }
