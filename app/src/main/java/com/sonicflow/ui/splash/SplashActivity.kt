@@ -18,27 +18,27 @@ import kotlinx.coroutines.launch
 class SplashActivity : AppCompatActivity() {
     
     companion object {
-        private const val SPLASH_DURATION = 2000L // 2 secondes
+        private const val SPLASH_DURATION = 2000L // 2 seconds
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         installSplashScreen()
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         
-        // Récupérer les vues
+        // Get views
         val logoImageView = findViewById<ImageView>(R.id.splash_logo)
         val appNameTextView = findViewById<TextView>(R.id.splash_app_name)
         val taglineTextView = findViewById<TextView>(R.id.splash_tagline)
         
-        // Charger et démarrer les animations
+        // Load and start animations
         val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         
         logoImageView.startAnimation(fadeIn)
         appNameTextView.startAnimation(fadeIn)
         taglineTextView.startAnimation(fadeIn)
         
-        // Naviguer vers MainActivity après le délai
+        // Navigate to MainActivity after delay
         lifecycleScope.launch {
             delay(SPLASH_DURATION)
             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
