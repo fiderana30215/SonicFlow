@@ -8,8 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
@@ -32,29 +31,35 @@ fun RotatingAlbumArt(
     isPlaying: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // Infinite rotation animation
-    val infiniteTransition = rememberInfiniteTransition(label = "rotation")
+    // Track cumulative rotation to preserve position when paused
+    var targetRotation by remember { mutableStateOf(0f) }
     
-    val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 25000, // 25 seconds per rotation
-                easing = LinearEasing
-            ),
-            repeatMode = RepeatMode.Restart
-        ),
+    // Update target rotation when playing
+    LaunchedEffect(isPlaying) {
+        if (isPlaying) {
+            // Infinite rotation while playing
+            while (isPlaying) {
+                targetRotation += 360f
+                kotlinx.coroutines.delay(25000) // 25 seconds per rotation
+            }
+        }
+    }
+    
+    // Animate to target rotation
+    val rotation by animateFloatAsState(
+        targetValue = targetRotation,
+        animationSpec = if (isPlaying) {
+            tween(durationMillis = 25000, easing = LinearEasing)
+        } else {
+            snap() // Hold position when paused
+        },
         label = "rotation"
     )
-    
-    // Rotation value that only updates when playing
-    val currentRotation = if (isPlaying) rotation else 0f
     
     Card(
         modifier = modifier
             .size(220.dp)
-            .rotate(currentRotation),
+            .rotate(rotation),
         shape = CircleShape,
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
     ) {

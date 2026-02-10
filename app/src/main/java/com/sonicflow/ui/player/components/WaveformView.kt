@@ -55,7 +55,7 @@ fun WaveformView(
             // Enhanced color scheme with glow effect
             val color = when {
                 isCurrentBar && progress > 0 -> {
-                    // Glowing effect for current bar
+                    // Glowing effect for current bar using gradient
                     Brush.verticalGradient(
                         colors = listOf(
                             VioletPrimary.copy(alpha = 1f),
@@ -65,23 +65,19 @@ fun WaveformView(
                     )
                 }
                 barProgress <= progress -> {
-                    // Played bars
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            VioletPrimary.copy(alpha = 0.7f),
-                            VioletPrimary.copy(alpha = 0.7f)
-                        )
-                    )
+                    // Played bars - solid color
+                    null // Will use solid color below
                 }
                 else -> {
-                    // Unplayed bars
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Gray.copy(alpha = 0.3f),
-                            Color.Gray.copy(alpha = 0.3f)
-                        )
-                    )
+                    // Unplayed bars - solid color
+                    null // Will use solid color below
                 }
+            }
+            
+            val solidColor = when {
+                isCurrentBar && progress > 0 -> null // Using gradient
+                barProgress <= progress -> VioletPrimary.copy(alpha = 0.7f)
+                else -> Color.Gray.copy(alpha = 0.3f)
             }
             
             // Scale effect for current bar
@@ -89,12 +85,23 @@ fun WaveformView(
             val scaledHeight = barHeight * scale
             val scaledY = (canvasHeight - scaledHeight) / 2
             
-            drawRoundRect(
-                brush = color,
-                topLeft = Offset(x, scaledY),
-                size = Size(barWidth, scaledHeight),
-                cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
-            )
+            if (color != null) {
+                // Draw with gradient brush
+                drawRoundRect(
+                    brush = color,
+                    topLeft = Offset(x, scaledY),
+                    size = Size(barWidth, scaledHeight),
+                    cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
+                )
+            } else if (solidColor != null) {
+                // Draw with solid color
+                drawRoundRect(
+                    color = solidColor,
+                    topLeft = Offset(x, scaledY),
+                    size = Size(barWidth, scaledHeight),
+                    cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
+                )
+            }
         }
     }
 }
