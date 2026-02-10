@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.SonicFlow" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Base theme using Material3 NoActionBar -->
+    <style name="Theme.SonicFlow" parent="Theme.Material3.Dark.NoActionBar" />
     
+    <!-- Splash Screen theme for Android 12+ -->
     <style name="Theme.SonicFlow.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimationDuration">2000</item>
         <item name="postSplashScreenTheme">@style/Theme.SonicFlow</item>
     </style>
 </resources>
