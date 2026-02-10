@@ -32,34 +32,27 @@ fun RotatingAlbumArt(
     modifier: Modifier = Modifier
 ) {
     // Track cumulative rotation to preserve position when paused
-    var targetRotation by remember { mutableStateOf(0f) }
+    var currentRotation by remember { mutableStateOf(0f) }
     
-    // Update target rotation when playing
+    // Animate rotation continuously when playing
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
-            // Infinite rotation while playing
-            while (isPlaying) {
-                targetRotation += 360f
-                kotlinx.coroutines.delay(25000) // 25 seconds per rotation
+            val startRotation = currentRotation
+            val startTime = withFrameNanos { it }
+            
+            while (true) {
+                withFrameNanos { frameTime ->
+                    val elapsed = (frameTime - startTime) / 1_000_000f // Convert to milliseconds
+                    currentRotation = startRotation + (elapsed / 25000f) * 360f
+                }
             }
         }
     }
     
-    // Animate to target rotation
-    val rotation by animateFloatAsState(
-        targetValue = targetRotation,
-        animationSpec = if (isPlaying) {
-            tween(durationMillis = 25000, easing = LinearEasing)
-        } else {
-            snap() // Hold position when paused
-        },
-        label = "rotation"
-    )
-    
     Card(
         modifier = modifier
             .size(220.dp)
-            .rotate(rotation),
+            .rotate(currentRotation),
         shape = CircleShape,
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
     ) {

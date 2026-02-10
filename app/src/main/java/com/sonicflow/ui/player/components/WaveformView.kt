@@ -52,55 +52,47 @@ fun WaveformView(
             val barProgress = index.toFloat() / amplitudes.size
             val isCurrentBar = index == currentBarIndex
             
-            // Enhanced color scheme with glow effect
-            val color = when {
+            // Scale effect for current bar
+            val scale = if (isCurrentBar && progress > 0) 1.3f else 1.0f
+            val scaledHeight = barHeight * scale
+            val scaledY = (canvasHeight - scaledHeight) / 2
+            
+            // Determine rendering style for this bar
+            when {
                 isCurrentBar && progress > 0 -> {
                     // Glowing effect for current bar using gradient
-                    Brush.verticalGradient(
+                    val gradientBrush = Brush.verticalGradient(
                         colors = listOf(
                             VioletPrimary.copy(alpha = 1f),
                             VioletPrimary.copy(alpha = 0.8f),
                             VioletPrimary.copy(alpha = 1f)
                         )
                     )
+                    drawRoundRect(
+                        brush = gradientBrush,
+                        topLeft = Offset(x, scaledY),
+                        size = Size(barWidth, scaledHeight),
+                        cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
+                    )
                 }
                 barProgress <= progress -> {
                     // Played bars - solid color
-                    null // Will use solid color below
+                    drawRoundRect(
+                        color = VioletPrimary.copy(alpha = 0.7f),
+                        topLeft = Offset(x, scaledY),
+                        size = Size(barWidth, scaledHeight),
+                        cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
+                    )
                 }
                 else -> {
                     // Unplayed bars - solid color
-                    null // Will use solid color below
+                    drawRoundRect(
+                        color = Color.Gray.copy(alpha = 0.3f),
+                        topLeft = Offset(x, scaledY),
+                        size = Size(barWidth, scaledHeight),
+                        cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
+                    )
                 }
-            }
-            
-            val solidColor = when {
-                isCurrentBar && progress > 0 -> null // Using gradient
-                barProgress <= progress -> VioletPrimary.copy(alpha = 0.7f)
-                else -> Color.Gray.copy(alpha = 0.3f)
-            }
-            
-            // Scale effect for current bar
-            val scale = if (isCurrentBar && progress > 0) 1.3f else 1.0f
-            val scaledHeight = barHeight * scale
-            val scaledY = (canvasHeight - scaledHeight) / 2
-            
-            if (color != null) {
-                // Draw with gradient brush
-                drawRoundRect(
-                    brush = color,
-                    topLeft = Offset(x, scaledY),
-                    size = Size(barWidth, scaledHeight),
-                    cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
-                )
-            } else if (solidColor != null) {
-                // Draw with solid color
-                drawRoundRect(
-                    color = solidColor,
-                    topLeft = Offset(x, scaledY),
-                    size = Size(barWidth, scaledHeight),
-                    cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
-                )
             }
         }
     }
