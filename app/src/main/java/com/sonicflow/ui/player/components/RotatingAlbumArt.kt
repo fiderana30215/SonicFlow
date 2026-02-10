@@ -17,6 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.sonicflow.ui.theme.VioletPrimary
+import kotlinx.coroutines.isActive
 
 /**
  * Rotating album art component that rotates during playback
