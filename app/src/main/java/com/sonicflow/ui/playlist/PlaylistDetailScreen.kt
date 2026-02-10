@@ -97,7 +97,7 @@ fun PlaylistDetailScreen(
                         }
                     }
                 }
-                is PlaylistUiState.Success -> {
+                is PlaylistUiState.Success, is PlaylistUiState.PlaylistCreated -> {
                     selectedPlaylist?.let { playlist ->
                         Column(modifier = Modifier.fillMaxSize()) {
                             PlaylistHeader(
