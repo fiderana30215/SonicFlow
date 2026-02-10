@@ -17,17 +17,20 @@ class SplashActivity : AppCompatActivity() {
         private const val SPLASH_DURATION = 2000L
     }
     
+    private var keepSplashScreen = true
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen before calling super.onCreate()
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         
         // Keep splash screen visible while loading
-        splashScreen.setKeepOnScreenCondition { true }
+        splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         
         // Navigate to MainActivity after delay
         lifecycleScope.launch {
             delay(SPLASH_DURATION)
+            keepSplashScreen = false
             if (!isFinishing) {
                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                 finish()
