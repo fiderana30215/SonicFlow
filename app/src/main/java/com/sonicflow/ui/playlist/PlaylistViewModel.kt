@@ -83,7 +83,9 @@ class PlaylistViewModel @Inject constructor(
             try {
                 _uiState.value = PlaylistUiState.Loading
                 managePlaylistUseCase.createPlaylist(name, description)
-                _uiState.value = PlaylistUiState.Success
+                _uiState.value = PlaylistUiState.PlaylistCreated
+                // Reload playlists to show the newly created one
+                loadPlaylists()
             } catch (e: Exception) {
                 _uiState.value = PlaylistUiState.Error(e.message ?: "Failed to create playlist")
             }
@@ -137,4 +139,5 @@ sealed class PlaylistUiState {
     object Loading : PlaylistUiState()
     object Success : PlaylistUiState()
     data class Error(val message: String) : PlaylistUiState()
+    object PlaylistCreated : PlaylistUiState()
 }

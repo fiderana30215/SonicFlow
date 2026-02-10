@@ -89,7 +89,7 @@ class PlayerViewModel @Inject constructor(
     
     private fun loadWaveform(filePath: String) {
         viewModelScope.launch {
-            val waveform = waveformExtractor.extractWaveform(filePath, samplesCount = 100)
+            val waveform = waveformExtractor.extractWaveform(filePath, samplesCount = 150)
             _waveformData.value = waveform
         }
     }

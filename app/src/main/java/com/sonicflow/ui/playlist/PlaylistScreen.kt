@@ -35,6 +35,17 @@ fun PlaylistScreen(
     
     var showCreateDialog by remember { mutableStateOf(false) }
     var playlistToDelete by remember { mutableStateOf<Playlist?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    
+    // Handle playlist creation success
+    LaunchedEffect(uiState) {
+        if (uiState is PlaylistUiState.PlaylistCreated) {
+            snackbarHostState.showSnackbar(
+                message = "Playlist created successfully!",
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -65,6 +76,9 @@ fun PlaylistScreen(
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
         Box(
@@ -97,7 +111,7 @@ fun PlaylistScreen(
                         }
                     }
                 }
-                is PlaylistUiState.Success -> {
+                is PlaylistUiState.Success, is PlaylistUiState.PlaylistCreated -> {
                     if (playlists.isEmpty()) {
                         Column(
                             modifier = Modifier
