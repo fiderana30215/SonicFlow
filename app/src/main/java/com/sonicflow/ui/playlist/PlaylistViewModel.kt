@@ -82,7 +82,7 @@ class PlaylistViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.value = PlaylistUiState.Loading
-                val playlistId = managePlaylistUseCase.createPlaylist(name, description)
+                managePlaylistUseCase.createPlaylist(name, description)
                 _uiState.value = PlaylistUiState.PlaylistCreated
                 // Reload playlists to show the newly created one
                 loadPlaylists()

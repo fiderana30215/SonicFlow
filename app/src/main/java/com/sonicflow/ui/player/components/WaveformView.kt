@@ -52,14 +52,14 @@ fun WaveformView(
             val barProgress = index.toFloat() / amplitudes.size
             val isCurrentBar = index == currentBarIndex
             
-            // Scale effect for current bar
-            val scale = if (isCurrentBar && progress > 0) 1.3f else 1.0f
-            val scaledHeight = barHeight * scale
-            val scaledY = (canvasHeight - scaledHeight) / 2
-            
             // Determine rendering style for this bar
             when {
                 isCurrentBar && progress > 0 -> {
+                    // Scale effect for current bar
+                    val scale = 1.3f
+                    val scaledHeight = barHeight * scale
+                    val scaledY = (canvasHeight - scaledHeight) / 2
+                    
                     // Glowing effect for current bar using gradient
                     val gradientBrush = Brush.verticalGradient(
                         colors = listOf(
@@ -76,20 +76,20 @@ fun WaveformView(
                     )
                 }
                 barProgress <= progress -> {
-                    // Played bars - solid color
+                    // Played bars - solid color, no scaling
                     drawRoundRect(
                         color = VioletPrimary.copy(alpha = 0.7f),
-                        topLeft = Offset(x, scaledY),
-                        size = Size(barWidth, scaledHeight),
+                        topLeft = Offset(x, y),
+                        size = Size(barWidth, barHeight),
                         cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
                     )
                 }
                 else -> {
-                    // Unplayed bars - solid color
+                    // Unplayed bars - solid color, no scaling
                     drawRoundRect(
                         color = Color.Gray.copy(alpha = 0.3f),
-                        topLeft = Offset(x, scaledY),
-                        size = Size(barWidth, scaledHeight),
+                        topLeft = Offset(x, y),
+                        size = Size(barWidth, barHeight),
                         cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
                     )
                 }

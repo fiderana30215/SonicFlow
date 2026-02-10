@@ -40,7 +40,7 @@ fun RotatingAlbumArt(
             val startRotation = currentRotation
             val startTime = withFrameNanos { it }
             
-            while (true) {
+            while (isActive) {
                 withFrameNanos { frameTime ->
                     val elapsed = (frameTime - startTime) / 1_000_000f // Convert to milliseconds
                     currentRotation = startRotation + (elapsed / 25000f) * 360f
