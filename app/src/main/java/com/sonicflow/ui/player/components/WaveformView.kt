@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
@@ -40,22 +41,58 @@ fun WaveformView(
         val barSpacing = canvasWidth / amplitudes.size
         val maxAmplitude = amplitudes.maxOrNull() ?: 1
         
+        // Calculate current bar index
+        val currentBarIndex = (progress * amplitudes.size).toInt().coerceIn(0, amplitudes.size - 1)
+        
         amplitudes.forEachIndexed { index, amplitude ->
             val barHeight = (amplitude.toFloat() / maxAmplitude) * canvasHeight * 0.8f
             val x = index * barSpacing
             val y = (canvasHeight - barHeight) / 2
             
             val barProgress = index.toFloat() / amplitudes.size
-            val color = if (barProgress <= progress) {
-                VioletPrimary
-            } else {
-                Color.Gray.copy(alpha = 0.3f)
+            val isCurrentBar = index == currentBarIndex
+            
+            // Enhanced color scheme with glow effect
+            val color = when {
+                isCurrentBar && progress > 0 -> {
+                    // Glowing effect for current bar
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            VioletPrimary.copy(alpha = 1f),
+                            VioletPrimary.copy(alpha = 0.8f),
+                            VioletPrimary.copy(alpha = 1f)
+                        )
+                    )
+                }
+                barProgress <= progress -> {
+                    // Played bars
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            VioletPrimary.copy(alpha = 0.7f),
+                            VioletPrimary.copy(alpha = 0.7f)
+                        )
+                    )
+                }
+                else -> {
+                    // Unplayed bars
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Gray.copy(alpha = 0.3f),
+                            Color.Gray.copy(alpha = 0.3f)
+                        )
+                    )
+                }
             }
             
+            // Scale effect for current bar
+            val scale = if (isCurrentBar && progress > 0) 1.3f else 1.0f
+            val scaledHeight = barHeight * scale
+            val scaledY = (canvasHeight - scaledHeight) / 2
+            
             drawRoundRect(
-                color = color,
-                topLeft = Offset(x, y),
-                size = Size(barWidth, barHeight),
+                brush = color,
+                topLeft = Offset(x, scaledY),
+                size = Size(barWidth, scaledHeight),
                 cornerRadius = CornerRadius(barWidth / 2, barWidth / 2)
             )
         }
