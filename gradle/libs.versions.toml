@@ -19,8 +19,10 @@ coil = "2.6.0"
 reorderable = "0.9.6"
 splashscreen = "1.0.1"
 constraintlayout = "2.1.4"
+appcompat = "1.7.0"
 
 [libraries]
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
