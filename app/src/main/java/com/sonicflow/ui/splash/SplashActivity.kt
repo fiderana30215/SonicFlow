@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,14 +86,14 @@ class SplashActivity : ComponentActivity() {
             ) {
                 Image(
                     painter = painterResource(id = R.mipmap.ic_launcher),
-                    contentDescription = "SonicFlow",
+                    contentDescription = stringResource(id = R.string.app_name),
                     modifier = Modifier.size(150.dp)
                 )
                 
                 Spacer(modifier = Modifier.height(24.dp))
                 
                 Text(
-                    text = "SonicFlow",
+                    text = stringResource(id = R.string.app_name),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     fontSize = 32.sp,
@@ -102,7 +103,7 @@ class SplashActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "Your Music, Your Flow",
+                    text = stringResource(id = R.string.splash_tagline),
                     style = MaterialTheme.typography.bodyLarge,
                     fontSize = 16.sp,
                     color = Color.White.copy(alpha = 0.8f)
