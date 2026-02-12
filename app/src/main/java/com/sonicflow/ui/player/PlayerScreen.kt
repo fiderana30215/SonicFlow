@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,10 +15,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sonicflow.ui.player.components.AnimatedWaveformDisk
+import com.sonicflow.ui.player.components.AnimatedWaveformView
 import com.sonicflow.ui.player.components.PlayerControls
-import com.sonicflow.ui.player.components.RotatingAlbumArt
 import com.sonicflow.ui.player.components.SeekBar
-import com.sonicflow.ui.player.components.WaveformView
 import com.sonicflow.ui.theme.VioletPrimary
 import com.sonicflow.ui.theme.VioletTertiary
 
@@ -37,11 +35,11 @@ fun PlayerScreen(
     val currentPosition by viewModel.currentPosition.collectAsState()
     val duration by viewModel.duration.collectAsState()
     val waveformData by viewModel.waveformData.collectAsState()
-    
+
     LaunchedEffect(trackId) {
         viewModel.loadTrack(trackId)
     }
-    
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -58,12 +56,13 @@ fun PlayerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp)
         ) {
             // Top bar with back button
             IconButton(
                 onClick = onNavigateBack,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
@@ -71,30 +70,28 @@ fun PlayerScreen(
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            // Rotating Album Art
+
+            // Album Art avec waveform circulaire animé
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
+                    .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                RotatingAlbumArt(
+                AnimatedWaveformDisk(
                     albumArtUri = currentTrack?.albumArtUri,
                     isPlaying = isPlaying,
+                    waveformData = waveformData,
                     modifier = Modifier
                 )
             }
-            
-            Spacer(modifier = Modifier.height(48.dp))
-            
+
             // Track info
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -105,9 +102,9 @@ fun PlayerScreen(
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = currentTrack?.artist ?: "Unknown Artist",
                     style = MaterialTheme.typography.bodyLarge,
@@ -117,13 +114,12 @@ fun PlayerScreen(
                     textAlign = TextAlign.Center
                 )
             }
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            // Waveform visualization
-            WaveformView(
+
+            // Waveform visualization animé
+            AnimatedWaveformView(
                 amplitudes = waveformData,
                 progress = if (duration > 0) currentPosition.toFloat() / duration.toFloat() else 0f,
+                isPlaying = isPlaying,
                 onSeek = { progress ->
                     viewModel.seekTo((progress * duration).toLong())
                 },
@@ -131,9 +127,9 @@ fun PlayerScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             // Seek bar
             SeekBar(
                 currentPosition = currentPosition,
@@ -143,9 +139,9 @@ fun PlayerScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             )
-            
-            Spacer(modifier = Modifier.weight(1f))
-            
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Player controls
             PlayerControls(
                 isPlaying = isPlaying,
@@ -154,7 +150,9 @@ fun PlayerScreen(
                 onNext = { viewModel.skipToNext() },
                 onShuffle = { /* TODO: Implement shuffle */ },
                 onRepeat = { /* TODO: Implement repeat */ },
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp)
             )
         }
     }
