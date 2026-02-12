@@ -79,10 +79,10 @@ fun AnimatedWaveformDisk(
             val canvasHeight = this.size.height
             val centerX = canvasWidth / 2
             val centerY = canvasHeight / 2
-            val radius = minOf(canvasWidth, canvasHeight) / 2 - 40f
+            val radius = minOf(canvasWidth, canvasHeight) / 2 - 20f // Rayon plus grand (réduit la marge de 40f à 20f)
 
-            // Nombre de barres ajusté pour l'espacement de 0.5cm
-            val numberOfBars = 80 // Plus de barres = moins d'espace entre elles
+            // Nombre de barres ajusté pour l'espacement
+            val numberOfBars = 72 // Réduit pour créer plus d'espace entre les barres
             val angleStep = (2 * PI) / numberOfBars
 
             repeat(numberOfBars) { i ->
@@ -92,12 +92,13 @@ fun AnimatedWaveformDisk(
                 val baseAmplitude = if (waveformData.isNotEmpty() && i < waveformData.size) {
                     waveformData[i].toFloat() / 100f
                 } else {
-                    // Pattern plus varié avec des hauteurs différentes
+                    // Pattern plus varié avec des hauteurs très différentes
                     val pattern = when {
-                        i % 8 == 0 -> 0.9f // Barres hautes
-                        i % 4 == 0 -> 0.6f // Barres moyennes
-                        i % 2 == 0 -> 0.4f // Barres basses
-                        else -> 0.2f // Très basses
+                        i % 7 == 0 -> 0.95f // Très hautes
+                        i % 5 == 0 -> 0.75f // Hautes
+                        i % 3 == 0 -> 0.5f  // Moyennes
+                        i % 2 == 0 -> 0.3f  // Basses
+                        else -> 0.15f       // Très basses
                     }
                     pattern
                 }
@@ -110,11 +111,11 @@ fun AnimatedWaveformDisk(
                     baseAmplitude * 0.5f
                 }
 
-                // Hauteur de la barre avec variation
-                val minHeight = 15f
-                val maxHeight = 70f
+                // Hauteur de la barre avec plus de variation
+                val minHeight = 10f
+                val maxHeight = 80f
                 val barHeight = minHeight + (animatedAmplitude * maxHeight)
-                val barWidth = 20f // 2cm ≈ 20dp (environ 0.75 pouces)
+                val barWidth = 20f // 2cm ≈ 20dp
 
                 // Couleur basée sur la position pour créer un motif
                 val colorIndex = (i / 3) % barColors.size
@@ -149,13 +150,13 @@ fun AnimatedWaveformDisk(
                 val p4X = endX - dx
                 val p4Y = endY - dy
 
-                // Dessiner la barre comme une ligne épaisse avec des bouts arrondis
+                // Dessiner la barre comme une ligne épaisse avec des bouts droits (sans arrondi)
                 drawLine(
                     color = color,
                     start = Offset(startX, startY),
                     end = Offset(endX, endY),
                     strokeWidth = barWidth,
-                    cap = androidx.compose.ui.graphics.StrokeCap.Round
+                    cap = androidx.compose.ui.graphics.StrokeCap.Butt // Bouts droits sans arrondi
                 )
             }
         }
@@ -163,7 +164,7 @@ fun AnimatedWaveformDisk(
         // Disque principal qui tourne
         Card(
             modifier = Modifier
-                .size(280.dp)
+                .size(360.dp) // Agrandi de 280.dp à 320.dp
                 .rotate(rotation),
             shape = CircleShape,
             elevation = CardDefaults.cardElevation(defaultElevation = 20.dp)
