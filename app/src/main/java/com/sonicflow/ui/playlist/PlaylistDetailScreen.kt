@@ -17,7 +17,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sonicflow.domain.model.Track
-import com.sonicflow.ui.library.components.TrackItem
 import com.sonicflow.ui.theme.TextSecondary
 import com.sonicflow.ui.theme.VioletPrimary
 import org.burnoutcrew.reorderable.*
@@ -30,11 +29,12 @@ import org.burnoutcrew.reorderable.*
 fun PlaylistDetailScreen(
     playlistId: Long,
     onNavigateBack: () -> Unit,
+    onNavigateToPlayer: (Long) -> Unit,  // AJOUTÉ: pour naviguer vers le player
     viewModel: PlaylistViewModel = hiltViewModel()
 ) {
     val selectedPlaylist by viewModel.selectedPlaylist.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
-    
+
     var trackToRemove by remember { mutableStateOf<Track?>(null) }
     var tracks by remember { mutableStateOf<List<Track>>(emptyList()) }
 
@@ -105,7 +105,7 @@ fun PlaylistDetailScreen(
                                 description = playlist.description,
                                 trackCount = playlist.trackCount
                             )
-                            
+
                             if (tracks.isEmpty()) {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
@@ -143,7 +143,7 @@ fun PlaylistDetailScreen(
                                         }
                                     }
                                 )
-                                
+
                                 LazyColumn(
                                     state = state.listState,
                                     modifier = Modifier
@@ -159,11 +159,12 @@ fun PlaylistDetailScreen(
                                                 if (isDragging) 8.dp else 0.dp,
                                                 label = "elevation"
                                             )
-                                            
+
                                             PlaylistTrackItem(
                                                 track = track,
                                                 index = index + 1,
                                                 onRemove = { trackToRemove = track },
+                                                onClick = { onNavigateToPlayer(track.id) },  // AJOUTÉ: naviguer vers player
                                                 modifier = Modifier.shadow(elevation)
                                             )
                                         }
@@ -232,9 +233,9 @@ private fun PlaylistHeader(
                         tint = VioletPrimary
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.width(16.dp))
-                
+
                 Column {
                     Text(
                         text = name,
@@ -243,9 +244,9 @@ private fun PlaylistHeader(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
-                    
+
                     Spacer(modifier = Modifier.height(4.dp))
-                    
+
                     Text(
                         text = "$trackCount ${if (trackCount == 1) "track" else "tracks"}",
                         style = MaterialTheme.typography.bodyMedium,
@@ -253,7 +254,7 @@ private fun PlaylistHeader(
                     )
                 }
             }
-            
+
             if (!description.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -271,12 +272,14 @@ private fun PlaylistTrackItem(
     track: Track,
     index: Int,
     onRemove: () -> Unit,
+    onClick: () -> Unit,  // AJOUTÉ: callback pour le clic
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .clickable(onClick = onClick),  // AJOUTÉ: rend l'item cliquable
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -293,7 +296,7 @@ private fun PlaylistTrackItem(
                 color = TextSecondary,
                 modifier = Modifier.width(32.dp)
             )
-            
+
             if (track.albumArtUri != null) {
                 coil.compose.AsyncImage(
                     model = track.albumArtUri,
@@ -319,9 +322,9 @@ private fun PlaylistTrackItem(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.width(12.dp))
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = track.title,
@@ -330,9 +333,9 @@ private fun PlaylistTrackItem(
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
-                
+
                 Text(
                     text = "${track.artist} • ${track.getFormattedDuration()}",
                     style = MaterialTheme.typography.bodyMedium,
@@ -341,7 +344,7 @@ private fun PlaylistTrackItem(
                     color = TextSecondary
                 )
             }
-            
+
             IconButton(onClick = onRemove) {
                 Icon(
                     imageVector = Icons.Default.Remove,
@@ -349,7 +352,7 @@ private fun PlaylistTrackItem(
                     tint = TextSecondary
                 )
             }
-            
+
             Icon(
                 imageVector = Icons.Default.DragHandle,
                 contentDescription = "Reorder",

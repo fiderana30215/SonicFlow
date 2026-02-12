@@ -11,7 +11,7 @@ import com.sonicflow.ui.auth.SignUpScreen
 import com.sonicflow.ui.library.LibraryScreen
 import com.sonicflow.ui.player.PlayerScreen
 import com.sonicflow.ui.playlist.PlaylistDetailScreen
-import com.sonicflow.ui.playlist.PlaylistScreen
+// import com.sonicflow.ui.playlist.PlaylistScreen // Commenté car non utilisé
 
 /**
  * Navigation graph for SonicFlow app
@@ -38,7 +38,7 @@ fun SonicFlowNavGraph(
                 }
             )
         }
-        
+
         composable(Screen.SignUp.route) {
             SignUpScreen(
                 onNavigateToSignIn = {
@@ -51,19 +51,19 @@ fun SonicFlowNavGraph(
                 }
             )
         }
-        
+
         // Main screens
         composable(Screen.Library.route) {
             LibraryScreen(
                 onNavigateToPlayer = { trackId ->
                     navController.navigate(Screen.Player.createRoute(trackId))
                 },
-                onNavigateToPlaylist = {
-                    navController.navigate(Screen.Playlist.route)
+                onNavigateToPlaylist = { playlistId ->  // MODIFIÉ: ajout du paramètre
+                    navController.navigate(Screen.PlaylistDetail.createRoute(playlistId))
                 }
             )
         }
-        
+
         composable(
             route = Screen.Player.route,
             arguments = listOf(
@@ -78,18 +78,19 @@ fun SonicFlowNavGraph(
                 }
             )
         }
-        
-        composable(Screen.Playlist.route) {
-            PlaylistScreen(
-                onNavigateToPlaylistDetail = { playlistId ->
-                    navController.navigate(Screen.PlaylistDetail.createRoute(playlistId))
-                },
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-        
+
+        // SUPPRIMER ou commenter cette section si PlaylistScreen n'existe pas
+        // composable(Screen.Playlist.route) {
+        //     PlaylistScreen(
+        //         onNavigateToPlaylistDetail = { playlistId ->
+        //             navController.navigate(Screen.PlaylistDetail.createRoute(playlistId))
+        //         },
+        //         onNavigateBack = {
+        //             navController.popBackStack()
+        //         }
+        //     )
+        // }
+
         composable(
             route = Screen.PlaylistDetail.route,
             arguments = listOf(
@@ -101,6 +102,9 @@ fun SonicFlowNavGraph(
                 playlistId = playlistId,
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToPlayer = { trackId ->  // AJOUTÉ: navigation vers Player
+                    navController.navigate(Screen.Player.createRoute(trackId))
                 }
             )
         }

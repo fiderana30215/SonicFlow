@@ -320,6 +320,33 @@ class LibraryViewModel @Inject constructor(
     }
 
     /**
+     * Add multiple tracks to playlist
+     */
+    fun addTracksToPlaylist(playlistId: Long, tracks: List<Track>) {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            try {
+                Log.d(TAG, "Adding ${tracks.size} tracks to playlist: $playlistId")
+
+                tracks.forEach { track ->
+                    managePlaylistUseCase.addTrackToPlaylist(playlistId, track.id)
+                }
+
+                _successMessage.value = "${tracks.size} tracks added to playlist"
+                Log.d(TAG, "Tracks added successfully")
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error adding tracks to playlist", e)
+                _errorMessage.value = "Error adding tracks: ${e.localizedMessage}"
+
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /**
      * Remove track from playlist
      */
     fun removeTrackFromPlaylist(playlistId: Long, trackId: Long) {

@@ -9,7 +9,6 @@ import com.sonicflow.media.WaveformExtractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,135 +33,83 @@ class PlayerViewModel @Inject constructor(
     private val _waveformData = MutableStateFlow<List<Int>>(emptyList())
     val waveformData: StateFlow<List<Int>> = _waveformData.asStateFlow()
 
-    // Track ID actuel pour éviter les chargements multiples
-    private var currentTrackId: Long? = null
+    private var allTracks: List<Track> = emptyList()
+    private var currentPlaylistId: Long? = null
 
     init {
         observeMediaControllerStates()
-    }
-
-    private fun observeMediaControllerStates() {
-        viewModelScope.launch {
-            mediaControllerManager.isPlaying
-                .catch { e -> println("Error observing isPlaying: $e") }
-                .collect { playing ->
-                    _isPlaying.value = playing
-                }
-        }
 
         viewModelScope.launch {
-            mediaControllerManager.currentPosition
-                .catch { e -> println("Error observing currentPosition: $e") }
-                .collect { position ->
-                    _currentPosition.value = position
-                }
+            getTracksUseCase().collect { tracks ->
+                allTracks = tracks
+            }
         }
 
-        viewModelScope.launch {
-            mediaControllerManager.duration
-                .catch { e -> println("Error observing duration: $e") }
-                .collect { duration ->
-                    _duration.value = duration
-                }
-        }
-
-        // Observer les changements de track (pour next/previous)
-        viewModelScope.launch {
-            mediaControllerManager.currentMediaItem
-                .catch { e -> println("Error observing currentMediaItem: $e") }
-                .collect { mediaItem ->
-                    mediaItem?.let {
-                        // Extraire l'ID du track depuis les métadonnées
-                        val trackId = it.mediaId.toLongOrNull()
-                        if (trackId != null && trackId != currentTrackId) {
-                            loadTrack(trackId)
-                        }
-                    }
-                }
-        }
-    }
-
-    fun loadTrack(trackId: Long) {
-        // Éviter de recharger le même track
-        if (currentTrackId == trackId) {
-            return
-        }
-        currentTrackId = trackId
-
-        viewModelScope.launch {
-            try {
-                val track = getTracksUseCase(trackId).firstOrNull()
-                _currentTrack.value = track
-
-                track?.let {
-                    _duration.value = it.duration
-
-                    // Jouer le track
-                    mediaControllerManager.playTrack(it.filePath)
-
-                    // Charger le waveform
-                    loadWaveform(it.filePath)
-                }
-            } catch (e: Exception) {
-                println("Error loading track: $e")
+        // Callback pour mettre à jour le track quand il change
+        mediaControllerManager.onTrackChanged = { trackId ->
+            viewModelScope.launch {
+                loadTrackById(trackId)
             }
         }
     }
 
-    fun togglePlayPause() {
-        try {
-            mediaControllerManager.togglePlayPause()
-        } catch (e: Exception) {
-            println("Error toggling play/pause: $e")
+    private fun observeMediaControllerStates() {
+        viewModelScope.launch {
+            mediaControllerManager.isPlaying.collect { playing ->
+                _isPlaying.value = playing
+            }
+        }
+
+        viewModelScope.launch {
+            mediaControllerManager.currentPosition.collect { position ->
+                _currentPosition.value = position
+            }
+        }
+
+        viewModelScope.launch {
+            mediaControllerManager.duration.collect { duration ->
+                _duration.value = duration
+            }
         }
     }
 
-    fun seekTo(position: Long) {
-        try {
-            mediaControllerManager.seekTo(position)
-        } catch (e: Exception) {
-            println("Error seeking: $e")
+    fun loadTrack(trackId: Long) {
+        viewModelScope.launch {
+            // Charger le track
+            loadTrackById(trackId)
+
+            // Configurer la playlist pour next/previous
+            val trackFilePaths = allTracks.map { it.filePath }
+            val startIndex = allTracks.indexOfFirst { it.id == trackId }.coerceAtLeast(0)
+            mediaControllerManager.setPlaylist(trackFilePaths, startIndex)
         }
     }
 
-    fun skipToNext() {
+    private suspend fun loadTrackById(trackId: Long) {
         try {
-            mediaControllerManager.skipToNext()
+            val track = getTracksUseCase(trackId).firstOrNull()
+            _currentTrack.value = track
+            track?.let {
+                _duration.value = it.duration
+                loadWaveform(it.filePath)
+            }
         } catch (e: Exception) {
-            println("Error skipping to next: $e")
+            println("Error loading track: $e")
         }
     }
 
-    fun skipToPrevious() {
-        try {
-            mediaControllerManager.skipToPrevious()
-        } catch (e: Exception) {
-            println("Error skipping to previous: $e")
-        }
-    }
+    fun togglePlayPause() = mediaControllerManager.togglePlayPause()
+    fun seekTo(position: Long) = mediaControllerManager.seekTo(position)
+    fun skipToNext() = mediaControllerManager.skipToNext()
+    fun skipToPrevious() = mediaControllerManager.skipToPrevious()
 
     private fun loadWaveform(filePath: String) {
         viewModelScope.launch {
             try {
-                // Réinitialiser le waveform
                 _waveformData.value = emptyList()
-
-                // Ajouter un petit délai pour l'UI
-                delay(100)
-
-                val waveform = waveformExtractor.extractWaveform(
-                    filePath = filePath,
-                    samplesCount = 80 // Réduire pour les performances
-                )
-
-                if (waveform.isNotEmpty()) {
-                    _waveformData.value = waveform
-                } else {
-                    // Générer des données de fallback
-                    _waveformData.value = generateFallbackWaveform(80)
-                }
+                val waveform = waveformExtractor.extractWaveform(filePath, 80)
+                _waveformData.value = if (waveform.isNotEmpty()) waveform else generateFallbackWaveform(80)
             } catch (e: Exception) {
-                e.printStackTrace()
                 _waveformData.value = generateFallbackWaveform(80)
             }
         }
@@ -174,38 +121,5 @@ class PlayerViewModel @Inject constructor(
             val randomVariation = (Math.random() * 30).toInt()
             (sinValue.toInt() + randomVariation).coerceIn(20, 95)
         }
-    }
-
-    private fun normalizeWaveform(amplitudes: List<Int>): List<Int> {
-        if (amplitudes.isEmpty()) return emptyList()
-
-        val maxAmplitude = amplitudes.maxOrNull() ?: 1
-        return if (maxAmplitude > 0) {
-            amplitudes.map { amplitude ->
-                // Normaliser entre 10 et 100 pour avoir des barres visibles
-                val normalized = ((amplitude.toFloat() / maxAmplitude) * 90) + 10
-                normalized.toInt().coerceIn(10, 100)
-            }
-        } else {
-            amplitudes
-        }
-    }
-
-    private fun generateDefaultWaveform(): List<Int> {
-        // Générer des données de test réalistes
-        return List(100) { index ->
-            val sinValue = Math.sin(index * 0.3).toFloat()
-            val randomFactor = 0.7f + (Math.random().toFloat() * 0.6f)
-            ((sinValue * 0.5f + 0.5f) * 80 * randomFactor + 20).toInt()
-        }
-    }
-
-    fun reset() {
-        currentTrackId = null
-        _currentTrack.value = null
-        _waveformData.value = emptyList()
-        _currentPosition.value = 0L
-        _duration.value = 0L
-        _isPlaying.value = false
     }
 }

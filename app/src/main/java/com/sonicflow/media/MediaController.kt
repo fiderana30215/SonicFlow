@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -20,9 +19,6 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Manager for MediaController to control playback
- */
 @Singleton
 class MediaControllerManager @Inject constructor(
     @ApplicationContext private val context: Context
@@ -50,17 +46,15 @@ class MediaControllerManager @Inject constructor(
     private var positionUpdateJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    // Stocker la playlist complète
-    private var currentPlaylist: List<MediaItem> = emptyList()
+    // Callback pour la fin de la playlist
+    var onPlaylistEnded: (() -> Unit)? = null
+    var onTrackChanged: ((Long) -> Unit)? = null
 
     init {
         Log.d(TAG, "MediaControllerManager created, initializing...")
         initialize()
     }
 
-    /**
-     * Initialize MediaController
-     */
     private fun initialize() {
         Log.d(TAG, "Initializing MediaController...")
 
@@ -84,41 +78,40 @@ class MediaControllerManager @Inject constructor(
         )
     }
 
-    /**
-     * Setup player event listener
-     */
     private fun setupPlayerListener() {
         mediaController?.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 Log.d(TAG, "onIsPlayingChanged: $isPlaying")
                 _isPlaying.value = isPlaying
-
-                if (isPlaying) {
-                    startPositionUpdates()
-                } else {
-                    stopPositionUpdates()
-                }
+                if (isPlaying) startPositionUpdates() else stopPositionUpdates()
             }
 
             override fun onPlaybackStateChanged(playbackState: Int) {
                 Log.d(TAG, "onPlaybackStateChanged: $playbackState")
                 updatePlaybackState()
+
+                // FIN DE PISTE - Passage automatique au suivant
+                if (playbackState == Player.STATE_ENDED) {
+                    Log.d(TAG, "Playback ended - playing next")
+                    skipToNext()
+                }
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 Log.d(TAG, "onMediaItemTransition: ${mediaItem?.mediaId}")
                 _currentMediaItem.value = mediaItem
                 updatePlaybackState()
+
+                // Notifier le changement de track
+                mediaItem?.mediaId?.toLongOrNull()?.let { trackId ->
+                    onTrackChanged?.invoke(trackId)
+                }
             }
         })
 
-        // Mettre à jour le MediaItem actuel
         _currentMediaItem.value = mediaController?.currentMediaItem
     }
 
-    /**
-     * Start periodic position updates
-     */
     private fun startPositionUpdates() {
         stopPositionUpdates()
         positionUpdateJob = scope.launch {
@@ -129,17 +122,11 @@ class MediaControllerManager @Inject constructor(
         }
     }
 
-    /**
-     * Stop periodic position updates
-     */
     private fun stopPositionUpdates() {
         positionUpdateJob?.cancel()
         positionUpdateJob = null
     }
 
-    /**
-     * Update playback state
-     */
     private fun updatePlaybackState() {
         mediaController?.let { controller ->
             _currentPosition.value = controller.currentPosition.coerceAtLeast(0L)
@@ -148,47 +135,10 @@ class MediaControllerManager @Inject constructor(
     }
 
     /**
-     * Set la playlist complète (nécessaire pour next/previous)
-     */
-    fun setPlaylist(tracks: List<Pair<Long, String>>, startIndex: Int = 0) {
-        Log.d(TAG, "setPlaylist called with ${tracks.size} tracks, startIndex: $startIndex")
-
-        mediaController?.let { controller ->
-            try {
-                currentPlaylist = tracks.map { (id, filePath) ->
-                    val uri = if (filePath.startsWith("content://")) {
-                        Uri.parse(filePath)
-                    } else {
-                        Uri.fromFile(File(filePath))
-                    }
-
-                    MediaItem.Builder()
-                        .setUri(uri)
-                        .setMediaId(id.toString())
-                        .build()
-                }
-
-                controller.setMediaItems(currentPlaylist, startIndex, 0)
-                controller.prepare()
-                controller.play()
-
-                _currentMediaItem.value = controller.currentMediaItem
-
-                Log.d(TAG, "Playlist set successfully")
-            } catch (e: Exception) {
-                Log.e(TAG, "Error setting playlist", e)
-            }
-        } ?: run {
-            Log.e(TAG, "MediaController is null, cannot set playlist")
-        }
-    }
-
-    /**
-     * Play a track (version simple pour compatibilité)
+     * Play a single track
      */
     fun playTrack(filePath: String) {
         Log.d(TAG, "playTrack called with: $filePath")
-
         mediaController?.let { controller ->
             try {
                 val uri = if (filePath.startsWith("content://")) {
@@ -197,80 +147,78 @@ class MediaControllerManager @Inject constructor(
                     Uri.fromFile(File(filePath))
                 }
 
-                Log.d(TAG, "Playing URI: $uri")
-
                 val mediaItem = MediaItem.fromUri(uri)
                 controller.setMediaItem(mediaItem)
                 controller.prepare()
                 controller.play()
-
                 _currentMediaItem.value = mediaItem
-
                 Log.d(TAG, "Playback started")
             } catch (e: Exception) {
                 Log.e(TAG, "Error playing track", e)
             }
-        } ?: run {
-            Log.e(TAG, "MediaController is null, cannot play track")
         }
     }
 
     /**
-     * Play/pause toggle
+     * Set playlist for navigation
      */
+    fun setPlaylist(filePaths: List<String>, startIndex: Int = 0) {
+        Log.d(TAG, "setPlaylist called with ${filePaths.size} tracks, startIndex: $startIndex")
+
+        try {
+            val mediaItems = filePaths.map { filePath ->
+                val uri = if (filePath.startsWith("content://")) {
+                    Uri.parse(filePath)
+                } else {
+                    Uri.fromFile(File(filePath))
+                }
+                MediaItem.fromUri(uri)
+            }
+
+            mediaController?.let { controller ->
+                controller.setMediaItems(mediaItems, startIndex, 0)
+                controller.prepare()
+                controller.play()
+                Log.d(TAG, "Playlist set successfully")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting playlist", e)
+        }
+    }
+
     fun togglePlayPause() {
         mediaController?.let { controller ->
-            if (controller.isPlaying) {
-                controller.pause()
-                Log.d(TAG, "Paused")
-            } else {
-                controller.play()
-                Log.d(TAG, "Playing")
-            }
+            if (controller.isPlaying) controller.pause() else controller.play()
         }
     }
 
-    /**
-     * Seek to position
-     */
     fun seekTo(position: Long) {
-        Log.d(TAG, "seekTo: $position")
         mediaController?.seekTo(position)
     }
 
-    /**
-     * Skip to next
-     */
     fun skipToNext() {
         Log.d(TAG, "skipToNext called")
         mediaController?.let { controller ->
             if (controller.hasNextMediaItem()) {
                 controller.seekToNextMediaItem()
-                Log.d(TAG, "Skipped to next track")
             } else {
-                Log.d(TAG, "No next track available")
+                // Fin de playlist
+                onPlaylistEnded?.invoke()
             }
         }
     }
 
-    /**
-     * Skip to previous
-     */
     fun skipToPrevious() {
         Log.d(TAG, "skipToPrevious called")
         mediaController?.let { controller ->
-            if (controller.hasPreviousMediaItem()) {
+            if (controller.currentPosition > 3000) {
+                controller.seekTo(0)
+            } else if (controller.hasPreviousMediaItem()) {
                 controller.seekToPreviousMediaItem()
-                Log.d(TAG, "Skipped to previous track")
-            } else {
-                Log.d(TAG, "No previous track available")
             }
         }
     }
 
-    /**
-     * Release resources
-     */
     fun release() {
         Log.d(TAG, "Releasing MediaController")
         stopPositionUpdates()

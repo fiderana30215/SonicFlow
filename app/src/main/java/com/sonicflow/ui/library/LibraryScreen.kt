@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sonicflow.domain.model.Playlist
 import com.sonicflow.domain.model.Track
 import com.sonicflow.ui.library.components.*
 
@@ -21,7 +22,7 @@ import com.sonicflow.ui.library.components.*
 @Composable
 fun LibraryScreen(
     onNavigateToPlayer: (Long) -> Unit,
-    onNavigateToPlaylist: () -> Unit,
+    onNavigateToPlaylist: (Long) -> Unit,  // MODIFIÉ: prend l'ID de la playlist
     modifier: Modifier = Modifier,
     viewModel: LibraryViewModel = hiltViewModel()
 ) {
@@ -38,9 +39,13 @@ fun LibraryScreen(
     var showCreatePlaylistDialog by remember { mutableStateOf(false) }
     var selectedTrackForPlaylist by remember { mutableStateOf<Track?>(null) }
 
-    // États pour l'ajout aux playlists existantes
+    // États pour l'ajout aux playlists existantes (depuis un track)
     var showAddToPlaylistDialog by remember { mutableStateOf(false) }
     var selectedTrackForAddToPlaylist by remember { mutableStateOf<Track?>(null) }
+
+    // États pour l'ajout de tracks à une playlist (depuis une playlist)
+    var showSelectTracksDialog by remember { mutableStateOf(false) }
+    var selectedPlaylistForAddTracks by remember { mutableStateOf<Playlist?>(null) }
 
     // États pour les détails et partage
     var showTrackDetails by remember { mutableStateOf(false) }
@@ -184,11 +189,11 @@ fun LibraryScreen(
                             ) { playlist ->
                                 PlaylistItem(
                                     playlist = playlist,
-                                    onClick = { onNavigateToPlaylist() },
+                                    onClick = { onNavigateToPlaylist(playlist.id) },  // MODIFIÉ: passe l'ID
                                     onDelete = { viewModel.deletePlaylist(playlist.id) },
                                     onAddTrack = {
-                                        // TODO: Implémenter la sélection multiple de tracks
-                                        println("Add track to playlist: ${playlist.name}")
+                                        selectedPlaylistForAddTracks = playlist
+                                        showSelectTracksDialog = true
                                     }
                                 )
                             }
@@ -232,7 +237,7 @@ fun LibraryScreen(
         )
     }
 
-    // Dialogue d'ajout aux playlists existantes
+    // Dialogue d'ajout aux playlists existantes (depuis un track)
     if (showAddToPlaylistDialog && selectedTrackForAddToPlaylist != null) {
         AddTrackToPlaylistDialog(
             playlists = playlists,
@@ -245,6 +250,23 @@ fun LibraryScreen(
                 viewModel.addTrackToPlaylist(playlist.id, track)
                 showAddToPlaylistDialog = false
                 selectedTrackForAddToPlaylist = null
+            }
+        )
+    }
+
+    // Dialogue de sélection de tracks pour ajout à une playlist (depuis une playlist)
+    if (showSelectTracksDialog && selectedPlaylistForAddTracks != null) {
+        SelectTracksDialog(
+            tracks = tracks,
+            playlistName = selectedPlaylistForAddTracks!!.name,
+            onDismiss = {
+                showSelectTracksDialog = false
+                selectedPlaylistForAddTracks = null
+            },
+            onAddTracks = { selectedTracks ->
+                viewModel.addTracksToPlaylist(selectedPlaylistForAddTracks!!.id, selectedTracks)
+                showSelectTracksDialog = false
+                selectedPlaylistForAddTracks = null
             }
         )
     }
