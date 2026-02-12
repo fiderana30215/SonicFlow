@@ -12,9 +12,10 @@ import com.sonicflow.R
 /**
  * Composant pour afficher l'image de fond de l'application
  * 
- * Pour utiliser ce composant:
+ * Pour utiliser une image personnalisée:
  * 1. Placez votre image 'fond.jpg' dans app/src/main/res/drawable/
- * 2. Utilisez BackgroundImage() dans un Box avant votre contenu
+ * 2. Décommentez le bloc Image ci-dessous
+ * 3. Commentez le Spacer
  * 
  * @param modifier Modifier pour personnaliser l'apparence
  * @param alpha Transparence de l'image (0.0 = invisible, 1.0 = opaque). Par défaut 0.3
@@ -24,83 +25,23 @@ fun BackgroundImage(
     modifier: Modifier = Modifier,
     alpha: Float = 0.3f
 ) {
+    // Version active: fonctionne sans image
+    // Pour ajouter une vraie image, décommentez le bloc Image et commentez le Spacer
+    
     Box(modifier = modifier.fillMaxSize()) {
-        // NOTE: Pour utiliser cette image, vous devez:
-        // 1. Avoir un fichier fond.jpg dans res/drawable/
-        // 2. Décommenter le code ci-dessous
-        
-        /* Décommentez ce bloc une fois que fond.jpg est dans drawable/
+        /* Pour utiliser une image personnalisée, décommentez ce bloc:
         Image(
             painter = painterResource(id = R.drawable.fond),
             contentDescription = "Background image",
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop, // Remplit tout l'écran
-            alpha = alpha // Transparence pour garder le contenu lisible
-        )
-        */
-        
-        // ALTERNATIVE: Si vous n'avez pas encore l'image, utilisez une couleur unie
-        // Commentez cette ligne une fois que vous avez ajouté fond.jpg
-        androidx.compose.foundation.layout.Spacer(
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-/**
- * Variante avec effet de flou pour un look plus moderne
- * Nécessite: import androidx.compose.ui.draw.blur
- */
-@Composable
-fun BackgroundImageWithBlur(
-    modifier: Modifier = Modifier,
-    alpha: Float = 0.4f
-) {
-    Box(modifier = modifier.fillMaxSize()) {
-        /* Décommentez une fois fond.jpg ajouté
-        Image(
-            painter = painterResource(id = R.drawable.fond),
-            contentDescription = "Background image",
-            modifier = Modifier
-                .fillMaxSize()
-                .blur(10.dp), // Effet de flou
             contentScale = ContentScale.Crop,
             alpha = alpha
         )
         */
-    }
-}
-
-/**
- * Variante avec gradient par-dessus pour améliorer la lisibilité
- */
-@Composable
-fun BackgroundImageWithGradient(
-    modifier: Modifier = Modifier
-) {
-    Box(modifier = modifier.fillMaxSize()) {
-        /* Décommentez une fois fond.jpg ajouté
-        // Image de fond
-        Image(
-            painter = painterResource(id = R.drawable.fond),
-            contentDescription = "Background image",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
         
-        // Gradient sombre par-dessus pour la lisibilité
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Black.copy(alpha = 0.6f),
-                            Color.Black.copy(alpha = 0.3f)
-                        )
-                    )
-                )
+        // Placeholder actif - permet au composant de fonctionner sans image
+        androidx.compose.foundation.layout.Spacer(
+            modifier = Modifier.fillMaxSize()
         )
-        */
     }
 }

@@ -8,13 +8,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.sonicflow.ui.navigation.SonicFlowNavGraph
+import com.sonicflow.ui.theme.BackgroundImage
 import com.sonicflow.ui.theme.SonicFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -43,12 +46,19 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             SonicFlowTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val navController = rememberNavController()
-                    SonicFlowNavGraph(navController = navController)
+                // Box pour contenir l'image de fond et le contenu
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // Image de fond (placeholder pour l'instant)
+                    BackgroundImage()
+                    
+                    // Contenu de l'application par-dessus
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = Color.Transparent // Transparent pour voir le fond
+                    ) {
+                        val navController = rememberNavController()
+                        SonicFlowNavGraph(navController = navController)
+                    }
                 }
             }
         }
