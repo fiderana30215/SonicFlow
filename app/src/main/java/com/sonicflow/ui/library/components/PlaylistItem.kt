@@ -11,21 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.sonicflow.domain.model.Track
+import com.sonicflow.domain.model.Playlist
 import com.sonicflow.ui.theme.TextSecondary
 import com.sonicflow.ui.theme.VioletPrimary
 
-/**
- * Reusable track list item component
- */
 @Composable
-fun TrackItem(
-    track: Track,
+fun PlaylistItem(
+    playlist: Playlist,
     onClick: () -> Unit,
-    onAddToPlaylist: (Track) -> Unit = {},
-    onShare: (Track) -> Unit = {},
-    onDetails: (Track) -> Unit = {},
+    onDelete: () -> Unit = {},
+    onAddTrack: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -45,39 +40,29 @@ fun TrackItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Album art or music icon
-            if (track.albumArtUri != null) {
-                AsyncImage(
-                    model = track.albumArtUri,
-                    contentDescription = "Album art",
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(MaterialTheme.shapes.small)
+            // Playlist icon
+            Surface(
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(MaterialTheme.shapes.small),
+                color = VioletPrimary.copy(alpha = 0.2f)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlaylistPlay,
+                    contentDescription = "Playlist",
+                    modifier = Modifier.padding(12.dp),
+                    tint = VioletPrimary
                 )
-            } else {
-                Surface(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(MaterialTheme.shapes.small),
-                    color = VioletPrimary.copy(alpha = 0.2f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.MusicNote,
-                        contentDescription = "Music",
-                        modifier = Modifier.padding(12.dp),
-                        tint = VioletPrimary
-                    )
-                }
             }
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Track info
+            // Playlist info
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = track.title,
+                    text = playlist.name,
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -87,11 +72,23 @@ fun TrackItem(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "${track.artist} • ${track.getFormattedDuration()}",
+                    text = "${playlist.trackCount ?: 0} tracks • ${playlist.description ?: "No description"}",
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = TextSecondary
+                )
+            }
+
+            // Add track button
+            IconButton(
+                onClick = onAddTrack,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add track",
+                    tint = VioletPrimary
                 )
             }
 
@@ -110,44 +107,28 @@ fun TrackItem(
                     onDismissRequest = { showMenu = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Add to playlist") },
+                        text = { Text("Edit") },
                         onClick = {
                             showMenu = false
-                            onAddToPlaylist(track)
+                            // TODO: Edit playlist
                         },
                         leadingIcon = {
                             Icon(
-                                Icons.Default.PlaylistAdd,
-                                contentDescription = null,
-                                tint = VioletPrimary
+                                Icons.Default.Edit,
+                                contentDescription = null
                             )
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Share") },
+                        text = { Text("Delete") },
                         onClick = {
                             showMenu = false
-                            onShare(track)
+                            onDelete()
                         },
                         leadingIcon = {
                             Icon(
-                                Icons.Default.Share,
-                                contentDescription = null,
-                                tint = VioletPrimary
-                            )
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Details") },
-                        onClick = {
-                            showMenu = false
-                            onDetails(track)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Info,
-                                contentDescription = null,
-                                tint = VioletPrimary
+                                Icons.Default.Delete,
+                                contentDescription = null
                             )
                         }
                     )

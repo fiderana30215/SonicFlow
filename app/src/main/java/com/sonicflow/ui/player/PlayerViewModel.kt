@@ -65,6 +65,21 @@ class PlayerViewModel @Inject constructor(
                     _duration.value = duration
                 }
         }
+
+        // Observer les changements de track (pour next/previous)
+        viewModelScope.launch {
+            mediaControllerManager.currentMediaItem
+                .catch { e -> println("Error observing currentMediaItem: $e") }
+                .collect { mediaItem ->
+                    mediaItem?.let {
+                        // Extraire l'ID du track depuis les métadonnées
+                        val trackId = it.mediaId.toLongOrNull()
+                        if (trackId != null && trackId != currentTrackId) {
+                            loadTrack(trackId)
+                        }
+                    }
+                }
+        }
     }
 
     fun loadTrack(trackId: Long) {
