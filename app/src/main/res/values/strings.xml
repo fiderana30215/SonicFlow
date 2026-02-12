@@ -6,73 +6,16 @@
     <string name="splash_tagline">Your Music, Your Flow</string>
     
     <!-- Auth Screens -->
-    <string name="sign_in">Sign In</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="email">Email</string>
-    <string name="password">Password</string>
-    <string name="name">Name</string>
-    <string name="dont_have_account">Don\'t have an account? Sign up</string>
-    <string name="already_have_account">Already have an account? Sign in</string>
-    <string name="welcome_back">Welcome back to SonicFlow</string>
-    <string name="create_account">Create your SonicFlow account</string>
-    
+
     <!-- Library Screen -->
-    <string name="library">Library</string>
-    <string name="tracks">Tracks</string>
-    <string name="albums">Albums</string>
-    <string name="smart_lists">Smart Lists</string>
-    <string name="search_tracks">Search tracks</string>
-    <string name="scan_library">Scan Library</string>
-    <string name="no_tracks">No tracks found</string>
-    <string name="scan_to_start">Scan your library to get started</string>
-    <string name="loading">Loading...</string>
-    
+
     <!-- Player Screen -->
-    <string name="now_playing">Now Playing</string>
-    <string name="unknown_track">Unknown Track</string>
-    <string name="unknown_artist">Unknown Artist</string>
-    <string name="play">Play</string>
-    <string name="pause">Pause</string>
-    <string name="previous">Previous</string>
-    <string name="next">Next</string>
-    <string name="shuffle">Shuffle</string>
-    <string name="repeat">Repeat</string>
-    
+
     <!-- Playlist Screen -->
-    <string name="playlists">Playlists</string>
-    <string name="create_playlist">Create Playlist</string>
-    <string name="playlist_name">Playlist Name</string>
-    <string name="playlist_description">Description (optional)</string>
-    <string name="cancel">Cancel</string>
-    <string name="create">Create</string>
-    <string name="delete">Delete</string>
-    <string name="edit">Edit</string>
-    <string name="no_playlists">No playlists yet</string>
-    <string name="create_first_playlist">Create your first playlist</string>
-    <string name="track_count">%d tracks</string>
-    <string name="delete_playlist_title">Delete Playlist?</string>
-    <string name="delete_playlist_message">This action cannot be undone.</string>
-    <string name="remove_track_title">Remove Track?</string>
-    <string name="remove_track_message">Remove this track from the playlist?</string>
-    <string name="remove">Remove</string>
-    <string name="no_tracks_in_playlist">No tracks in this playlist</string>
-    <string name="add_tracks_to_start">Add tracks to get started</string>
-    
+
     <!-- Track Actions -->
-    <string name="add_to_playlist">Add to Playlist</string>
-    <string name="share">Share</string>
-    <string name="details">Details</string>
-    <string name="remove_from_playlist">Remove from Playlist</string>
-    
+
     <!-- Errors -->
-    <string name="error_loading_track">Error loading track</string>
-    <string name="error_loading_playlists">Error loading playlists</string>
-    <string name="error_creating_playlist">Error creating playlist</string>
-    <string name="invalid_email">Invalid email address</string>
-    <string name="password_too_short">Password must be at least 6 characters</string>
-    
+
     <!-- General -->
-    <string name="back">Back</string>
-    <string name="ok">OK</string>
-    <string name="save">Save</string>
 </resources>

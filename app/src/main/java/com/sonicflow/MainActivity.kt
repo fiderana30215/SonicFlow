@@ -17,6 +17,9 @@ import androidx.navigation.compose.rememberNavController
 import com.sonicflow.ui.navigation.SonicFlowNavGraph
 import com.sonicflow.ui.theme.SonicFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.graphics.Color
+import com.sonicflow.ui.theme.BackgroundImage
 
 /**
  * Main Activity for SonicFlow application
@@ -43,9 +46,10 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             SonicFlowTheme {
+                BackgroundImage()
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = Color.Transparent
                 ) {
                     val navController = rememberNavController()
                     SonicFlowNavGraph(navController = navController)
