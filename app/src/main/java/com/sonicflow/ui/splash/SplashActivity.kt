@@ -26,12 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.sonicflow.MainActivity
 import com.sonicflow.R
 import com.sonicflow.ui.theme.SonicFlowTheme
@@ -39,13 +39,13 @@ import kotlinx.coroutines.delay
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : ComponentActivity() {
-    
+
     companion object {
         private const val SPLASH_DURATION = 2000L // 2 seconds
     }
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        // ❌ SUPPRIMER cette ligne: installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
             SonicFlowTheme {
@@ -53,7 +53,7 @@ class SplashActivity : ComponentActivity() {
             }
         }
     }
-    
+
     @Composable
     private fun SplashScreen() {
         var startAnimation by remember { mutableStateOf(false) }
@@ -62,7 +62,7 @@ class SplashActivity : ComponentActivity() {
             animationSpec = tween(durationMillis = 1000),
             label = "splash_fade_in"
         )
-        
+
         LaunchedEffect(key1 = true) {
             startAnimation = true
             delay(SPLASH_DURATION)
@@ -71,10 +71,10 @@ class SplashActivity : ComponentActivity() {
                 finish()
             }
         }
-        
+
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = Color.Black // Fond noir
         ) {
             Column(
                 modifier = Modifier
@@ -88,22 +88,22 @@ class SplashActivity : ComponentActivity() {
                     contentDescription = stringResource(id = R.string.app_name),
                     modifier = Modifier.size(250.dp)
                 )
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 Text(
                     text = stringResource(id = R.string.app_name),
                     fontWeight = FontWeight.Bold,
                     fontSize = 32.sp,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = Color.White
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = stringResource(id = R.string.splash_tagline),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                    color = Color.Gray
                 )
             }
         }

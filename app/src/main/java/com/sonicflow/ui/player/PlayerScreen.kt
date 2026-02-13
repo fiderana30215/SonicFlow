@@ -20,7 +20,6 @@ import com.sonicflow.ui.player.components.AnimatedWaveformView
 import com.sonicflow.ui.player.components.PlayerControls
 import com.sonicflow.ui.player.components.SeekBar
 import com.sonicflow.ui.theme.VioletPrimary
-import com.sonicflow.ui.theme.VioletTertiary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,15 +42,7 @@ fun PlayerScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        VioletTertiary.copy(alpha = 0.3f),
-                        Color(0xFF121212),
-                        Color(0xFF121212)
-                    )
-                )
-            )
+            .background(Color.Black) // FOND TRÈS NOIR
     ) {
         Column(
             modifier = Modifier
@@ -67,7 +58,7 @@ fun PlayerScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = Color.White // Icône blanche sur fond noir
                 )
             }
 
@@ -97,7 +88,7 @@ fun PlayerScreen(
                 Text(
                     text = currentTrack?.title ?: "Unknown Track",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Color.White, // Texte blanc
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center
@@ -108,7 +99,7 @@ fun PlayerScreen(
                 Text(
                     text = currentTrack?.artist ?: "Unknown Artist",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.Gray, // Gris clair
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center

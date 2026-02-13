@@ -46,7 +46,7 @@ fun RotatingAlbumArt(
 
     Card(
         modifier = modifier
-            .size(280.dp) // Agrandi de 220dp à 280dp
+            .size(220.dp) // Agrandi de 220dp à 280dp
             .rotate(currentRotation),
         shape = CircleShape,
         elevation = CardDefaults.cardElevation(defaultElevation = 16.dp) // Augmenté l'ombre

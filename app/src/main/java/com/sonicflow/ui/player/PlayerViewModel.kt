@@ -1,5 +1,6 @@
 package com.sonicflow.ui.player
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sonicflow.domain.model.Track
@@ -42,13 +43,27 @@ class PlayerViewModel @Inject constructor(
         viewModelScope.launch {
             getTracksUseCase().collect { tracks ->
                 allTracks = tracks
+                Log.d("PlayerViewModel", "Loaded ${tracks.size} tracks")
             }
         }
 
         // Callback pour mettre à jour le track quand il change
         mediaControllerManager.onTrackChanged = { trackId ->
             viewModelScope.launch {
+                Log.d("PlayerViewModel", "onTrackChanged: $trackId")
                 loadTrackById(trackId)
+            }
+        }
+
+        // Callback pour la fin de la playlist
+        mediaControllerManager.onPlaylistEnded = {
+            viewModelScope.launch {
+                Log.d("PlayerViewModel", "onPlaylistEnded")
+                _currentTrack.value = null
+                _waveformData.value = emptyList()
+                _currentPosition.value = 0
+                _duration.value = 0
+                _isPlaying.value = false
             }
         }
     }
@@ -75,6 +90,8 @@ class PlayerViewModel @Inject constructor(
 
     fun loadTrack(trackId: Long) {
         viewModelScope.launch {
+            Log.d("PlayerViewModel", "loadTrack: $trackId")
+
             // Charger le track
             loadTrackById(trackId)
 
@@ -87,14 +104,16 @@ class PlayerViewModel @Inject constructor(
 
     private suspend fun loadTrackById(trackId: Long) {
         try {
+            Log.d("PlayerViewModel", "loadTrackById: $trackId")
             val track = getTracksUseCase(trackId).firstOrNull()
-            _currentTrack.value = track
-            track?.let {
-                _duration.value = it.duration
-                loadWaveform(it.filePath)
+            if (track != null) {
+                _currentTrack.value = track
+                _duration.value = track.duration
+                loadWaveform(track.filePath)
+                Log.d("PlayerViewModel", "Track loaded: ${track.title}")
             }
         } catch (e: Exception) {
-            println("Error loading track: $e")
+            Log.e("PlayerViewModel", "Error loading track", e)
         }
     }
 
@@ -109,7 +128,9 @@ class PlayerViewModel @Inject constructor(
                 _waveformData.value = emptyList()
                 val waveform = waveformExtractor.extractWaveform(filePath, 80)
                 _waveformData.value = if (waveform.isNotEmpty()) waveform else generateFallbackWaveform(80)
+                Log.d("PlayerViewModel", "Waveform loaded: ${_waveformData.value.size} samples")
             } catch (e: Exception) {
+                Log.e("PlayerViewModel", "Error loading waveform", e)
                 _waveformData.value = generateFallbackWaveform(80)
             }
         }
